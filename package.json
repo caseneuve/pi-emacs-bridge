@@ -1,0 +1,34 @@
+{
+  "name": "@caseneuve/pi-emacs-bridge",
+  "version": "0.1.0",
+  "description": "On-demand Emacs attach bridge for running Pi interactive sessions",
+  "type": "module",
+  "license": "MIT",
+  "keywords": [
+    "pi-package",
+    "pi",
+    "emacs"
+  ],
+  "pi": {
+    "extensions": [
+      "./extensions/emacs-bridge.ts"
+    ]
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "files": [
+    "extensions",
+    "emacs",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/caseneuve/pi-emacs-bridge.git"
+  },
+  "bugs": {
+    "url": "https://github.com/caseneuve/pi-emacs-bridge/issues"
+  },
+  "homepage": "https://github.com/caseneuve/pi-emacs-bridge#readme"
+}
