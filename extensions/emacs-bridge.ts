@@ -11,7 +11,6 @@ import type {
 
 const PROTOCOL = "pi-emacs-bridge.v1";
 const BRIDGE_DIR = path.join(os.homedir(), ".cache", "pi-emacs-bridge");
-const UPDATED_EVENT = "emacs-bridge:updated";
 const CLEAR_EDITOR_EVENT = "emacs-bridge:clear-editor";
 
 type BridgeRequest = {
@@ -259,16 +258,7 @@ export default function emacsBridgeExtension(pi: ExtensionAPI) {
   let server: net.Server | null = null;
   let metadata: BridgeMetadata | null = null;
   let metadataRefreshTimer: ReturnType<typeof setInterval> | null = null;
-  let insertCount = 0;
   const sockets = new Set<net.Socket>();
-
-  function setBridgeStatus(ctx: ExtensionContext, note?: string) {
-    if (!ctx.hasUI || !metadata) return;
-    const base = path.basename(metadata.socketPath);
-    const suffix = insertCount > 0 ? ` · +${insertCount}` : "";
-    const extra = note ? ` · ${note}` : "";
-    ctx.ui.setStatus("emacs-bridge", `emacs: ${base}${suffix}${extra}`);
-  }
 
   async function refreshMetadataFromContext(ctx: ExtensionContext) {
     if (!metadata) return;
@@ -367,12 +357,6 @@ export default function emacsBridgeExtension(pi: ExtensionAPI) {
 
           const res = handleRequest(req, ctxRef, pi);
           socket.write(`${JSON.stringify(res)}\n`);
-
-          if (res.ok && req.method === "insert") {
-            insertCount += 1;
-            setBridgeStatus(ctxRef, "updated");
-            pi.events.emit(UPDATED_EVENT, { insertCount });
-          }
         }
       });
 
@@ -416,7 +400,6 @@ export default function emacsBridgeExtension(pi: ExtensionAPI) {
     };
 
     await writeMetadata(metadata);
-    setBridgeStatus(ctx);
 
     metadataRefreshTimer = setInterval(() => {
       if (!ctxRef) return;
@@ -426,20 +409,13 @@ export default function emacsBridgeExtension(pi: ExtensionAPI) {
     }, 1500);
   }
 
-  pi.events.on(UPDATED_EVENT, () => {
-    if (!ctxRef) return;
-    setBridgeStatus(ctxRef);
-  });
-
   pi.events.on(CLEAR_EDITOR_EVENT, () => {
     if (!ctxRef || !ctxRef.hasUI) return;
     ctxRef.ui.setEditorText("");
-    setBridgeStatus(ctxRef, "cleared");
   });
 
   pi.on("session_start", async (_event, ctx) => {
     ctxRef = ctx;
-    insertCount = 0;
     await startServer(ctx);
   });
 
