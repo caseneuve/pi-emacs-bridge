@@ -207,7 +207,7 @@
 (defun pi-emacs-bridge--line-at (pos)
   (save-excursion
     (goto-char pos)
-    (line-number-at-pos)))
+    (line-number-at-pos nil t)))
 
 (defun pi-emacs-bridge--location-ref (&optional beg end)
   (let* ((file (or buffer-file-name (buffer-name)))
@@ -226,7 +226,7 @@
       (format "%s:%d" file start))))
 
 (defun pi-emacs-bridge--cursor-payload ()
-  `((line . ,(line-number-at-pos))
+  `((line . ,(line-number-at-pos nil t))
     (column . ,(current-column))
     (point . ,(point))
     (location . ,(pi-emacs-bridge--location-ref))))
