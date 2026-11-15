@@ -1,3 +1,8 @@
 node_modules/
 *.log
 .DS_Store
+
+# Shared notes only; keep local Pi configuration private.
+!/.pi/
+.pi/*
+!.pi/docs/

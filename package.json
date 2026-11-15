@@ -4,6 +4,23 @@
   "description": "On-demand Emacs attach bridge for running Pi interactive sessions",
   "type": "module",
   "license": "MIT",
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "scripts": {
+    "check:ci": "biome check --error-on-warnings .",
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --test test/*.test.ts",
+    "test:emacs": "emacs -Q --batch -l test/companion.test.el -f ert-run-tests-batch-and-exit",
+    "verify": "npm run check:ci && npm run typecheck && npm test",
+    "pack:check": "npm pack --dry-run --json"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.3.5",
+    "@earendil-works/pi-coding-agent": "1.5.2",
+    "@types/node": "24.10.1",
+    "typescript": "5.9.3"
+  },
   "keywords": [
     "pi-package",
     "pi",

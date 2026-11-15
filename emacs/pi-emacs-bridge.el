@@ -168,7 +168,7 @@
       (user-error "Bridge timeout waiting for %s" method))
 
     (let ((ok (alist-get 'ok response)))
-      (if ok
+      (if (eq ok t)
           (alist-get 'result response)
         (let ((err (alist-get 'error response)))
           (user-error "Bridge error (%s): %s"
@@ -387,7 +387,7 @@ With prefix arg REPLACE, replace Pi editor text instead of appending."
 Currently this aborts active streaming turn when Pi is busy."
   (interactive)
   (let ((result (pi-emacs-bridge--request "send_escape" nil)))
-    (if (alist-get 'aborted result)
+    (if (eq (alist-get 'aborted result) t)
         (message "Sent Escape: aborted active Pi turn")
       (message "Sent Escape: Pi already idle"))))
 

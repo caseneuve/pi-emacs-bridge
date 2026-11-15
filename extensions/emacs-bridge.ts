@@ -103,6 +103,14 @@ function buildSessionId(ctx: ExtensionContext): string {
   return currentLeafId(ctx) || randomUUID();
 }
 
+function refreshEditor(ctx: ExtensionContext): void {
+  // Pi 1.5.2's editor setters do not request a render outside terminal input.
+  // Clearing only our own never-visible status requests one through the public API.
+  if (ctx.mode === "tui") {
+    ctx.ui.setStatus("emacs-bridge", undefined);
+  }
+}
+
 function handleRequest(
   req: BridgeRequest,
   ctx: ExtensionContext,
@@ -171,6 +179,8 @@ function handleRequest(
       ctx.ui.pasteToEditor(text);
     }
 
+    refreshEditor(ctx);
+
     return {
       id,
       ok: true,
@@ -200,6 +210,8 @@ function handleRequest(
     }
     ctx.ui.setEditorText("");
 
+    refreshEditor(ctx);
+
     return {
       id,
       ok: true,
@@ -219,6 +231,7 @@ function handleRequest(
       ctx.abort();
     } else if (ctx.hasUI) {
       ctx.ui.setEditorText("");
+      refreshEditor(ctx);
     }
 
     return {
@@ -412,6 +425,8 @@ export default function emacsBridgeExtension(pi: ExtensionAPI) {
   pi.events.on(CLEAR_EDITOR_EVENT, () => {
     if (!ctxRef || !ctxRef.hasUI) return;
     ctxRef.ui.setEditorText("");
+
+    refreshEditor(ctxRef);
   });
 
   pi.on("session_start", async (_event, ctx) => {
